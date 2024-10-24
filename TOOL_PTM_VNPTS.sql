@@ -9,3 +9,5 @@ select  kieu_ld, somay, ma_kh, ten_tb, ngay_ld, nguoi_gt, manv_ptm, tennv_ptm, m
 from ttkd_bsc.dt_ptm_vnp_202409_bs a
 where exists(select 1 from ttkd_bsc.dt_ptm_vnp_202409 where somay = a.somay)
 ;
+
+--TEST SUA CODE 
