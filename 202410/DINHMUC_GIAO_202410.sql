@@ -15,11 +15,15 @@
 	"GHICHU" VARCHAR2(500 BYTE)
    ) 
 ;
-insert into BLDG_DANHMUC_VTCV_P1 (MA_VTCV, TEN_VTCV, P1, THANG_BD, THANG_KT, NGAY_INS, DONGIA, DINHMUC_1, DINHMUC_2, VANBAN, GHICHU)
-select MA_VTCV, TEN_VTCV, P1, THANG_BD, THANG_KT, NGAY_INS, DONGIA, DINHMUC_1, DINHMUC_2, VANBAN, GHICHU 
-from ttkd_bsc.BLDG_DANHMUC_VTCV_P11 
+insert into BLDG_DANHMUC_VTCV_P1 (MA_VTCV, TEN_VTCV, P1, THANG, THANG_KT, NGAY_INS, DONGIA, DINHMUC_1, DINHMUC_2, DINHMUC_3, VANBAN, GHICHU)
+select MA_VTCV, TEN_VTCV, P1, 202410, THANG_KT, sysdate, DONGIA, DINHMUC_1, DINHMUC_2, DINHMUC_3, VANBAN, GHICHU 
+from ttkd_bsc.BLDG_DANHMUC_VTCV_P1 where thang = 202409
 ;
+commit ;
+rollback ;
+select * from ttkd_bsc.BLDG_DANHMUC_VTCV_P1 where thang = 202410  ;
 
+drop TABLE TTKD_BSC.DINHMUC_GIAO_DTHU_PTM_202410 purge ;
 CREATE TABLE "TTKD_BSC"."DINHMUC_GIAO_DTHU_PTM_202410" 
    (	"THANG" NUMBER, 
 	"MA_NV" VARCHAR2(1316 BYTE), 
@@ -59,7 +63,8 @@ CREATE TABLE "TTKD_BSC"."DINHMUC_GIAO_DTHU_PTM_202410"
 	"NHOMCONLAI_KQTH" NUMBER, 
 	"TINH_BSC_OLD" NUMBER, 
 	"CANHAN_GIAO" NUMBER, 
-	"TINH_BSC" NUMBER
+	"TINH_BSC" NUMBER,
+    "THAYDOI_VTCV" NUMBER
    ) 
 ;   
 select * from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 ;
@@ -73,19 +78,20 @@ commit ;
 update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set 
                 ( BRCD_DTGIAO, MYTV_DTGIAO, VNPTT_DTGIAO, VNPTS_DTGIAO, TSL_DTGIAO, ITT_DTGIAO, CNTT_DTGIAO
                 , NHOMBRCD_DTGIAO, NHOMVINA_DTGIAO, NHOMTSL_DTGIAO, NHOMCNTT_DTGIAO, TONG_DTGIAO, CANHAN_GIAO, DATEINPUT, KHDK)
-=(
+ =(
     select BRCD_DTGIAO, MYTV_DTGIAO, VNPTT_DTGIAO, VNPTS_DTGIAO, TSL_DTGIAO, ITT_DTGIAO, CNTT_DTGIAO
          , NHOMBRCD_DTGIAO, NHOMVINA_DTGIAO, NHOMTSL_DTGIAO, NHOMCNTT_DTGIAO, TONG_DTGIAO, CANHAN_GIAO, DATEINPUT, KHDK
     from
     (
-    select distinct a.thang, a.MANV_HRM ma_nv
-                    , BRCD_DTGIAO, MYTV_DTGIAO, VNPTT_DTGIAO, VNPTS_DTGIAO, TSL_DTGIAO, ITT_DTGIAO, CNTT_DTGIAO
-                    , NHOMBRCD_DTGIAO, NHOMVINA_DTGIAO, NHOMTSL_DTGIAO, NHOMCNTT_DTGIAO, nvl(TONG_DTGIAO,0)TONG_DTGIAO
-                    , CANHAN_GIAO, DATEINPUT, 0 KHDK
-    from (select * from TTKDHCM_KTNV.ID430_DANGKY_CHOTTHANG where thang = 202410) a
-    order by 1,2,3
+        select distinct a.thang, a.MANV_HRM ma_nv
+                        , BRCD_DTGIAO, MYTV_DTGIAO, VNPTT_DTGIAO, VNPTS_DTGIAO, TSL_DTGIAO, ITT_DTGIAO, CNTT_DTGIAO
+                        , NHOMBRCD_DTGIAO, NHOMVINA_DTGIAO, NHOMTSL_DTGIAO, NHOMCNTT_DTGIAO, nvl(TONG_DTGIAO,0)TONG_DTGIAO
+                        , CANHAN_GIAO, DATEINPUT, 0 KHDK
+        from (select * from TTKDHCM_KTNV.ID430_DANGKY_CHOTTHANG where thang = 202410) a
+        order by 1,2,3
     ) 
-    where thang = a.thang and ma_nv = a.ma_nv)
+    where thang = a.thang and ma_nv = a.ma_nv
+   )
 where a.thang = 202410 ;
 commit ;
 update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set (dinhmuc_1, dinhmuc_2, dinhmuc_3)
@@ -114,7 +120,7 @@ update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set loai_kpi
                                                  when a.ma_vtcv in('VNP-HNHCM_BHKV_28') then 'KPI_CHT'
                                                  when a.ma_vtcv in('VNP-HNHCM_BHKV_42','VNP-HNHCM_KDOL_5','VNP-HNHCM_BHKV_51'
                                                                   ,'VNP-HNHCM_BHKV_17','VNP-HNHCM_BHKV_52','VNP-HNHCM_KHDN_10','VNP-HNHCM_BHKV_19'
-                                                                  ,'VNP-HNHCM_KDOL_10','VNP-HNHCM_KDOL_6','VNP-HNHCM_KDOL_18')
+                                                                  ,'VNP-HNHCM_KDOL_10','VNP-HNHCM_KDOL_6','VNP-HNHCM_KDOL_18','VNP-HNHCM_KDOL_23')
                                                     then 'KPI_TT'
                                                  when ma_vtcv in('VNP-HNHCM_KHDN_4') then 'KPI_TL'
                                                  when ma_vtcv in('VNP-HNHCM_BHKV_2','VNP-HNHCM_BHKV_2.1','VNP-HNHCM_KHDN_2','VNP-HNHCM_KDOL_2') then 'KPI_PGD'
@@ -129,7 +135,9 @@ where thang = 202410 and loai_kpi is null
 commit ;
 SELECT DISTINCT MA_VTCV, TEN_VTCV, LOAI_KPI FROM ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 ;
 
-SELECT DISTINCT MA_PB, TEN_PB FROM ttkd_bsc.dinhmuc_giao_dthu_ptm_202410  ;
+SELECT DISTINCT MA_PB, TEN_PB FROM ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 
+WHERE MA_PB IN('VNP0700100','VNP0700200','VNP0700600','VNP0700700','VNP0700900','VNP0700400','VNP0700800','VNP0700500','VNP0700300') ;
+
 DELETE FROM ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 
 WHERE MA_PB IN('VNP0700100','VNP0700200','VNP0700600','VNP0700700','VNP0700900','VNP0700400','VNP0700800','VNP0700500','VNP0700300') ;
 COMMIT ;
@@ -191,62 +199,26 @@ where thang = 202410 and loai_kpi = 'KPI_TT' and upper(bo_dau(ten_to)) = 'TO BAN
 ;
 commit ;
 
-update ttkd_bsc.dinhmuc_giao_dthu_ptm a set (dinhmuc_1,dinhmuc_2,dinhmuc_3)
-                                        =( select dinhmuc_1,dinhmuc_2,dinhmuc_3
-                                                from ( select ma_to, ten_to, sum(nvl(dinhmuc_1,0))dinhmuc_1
-                                                            , sum(nvl(dinhmuc_2,0))dinhmuc_2, sum(nvl(dinhmuc_3,0))dinhmuc_3
-                                                       from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410
-                                                       where loai_kpi in('KPI_NV') and thang = 202410 
-                                                         and tinh_bsc = 1 and dinhmuc_1 is not null
-                                                         and upper(bo_dau(ten_to)) = 'TO BAN HANG ONLINE'
-                                                       group by ma_to, ten_to
-                                                     ) b
-                                           where a.ma_to = b.ma_to 
-                                         )
-where thang = 202410 and loai_kpi = 'KPI_TT' and upper(bo_dau(ten_to)) = 'TO BAN HANG ONLINE'
---and tinh_bsc = 1 and thaydoi_vtcv = 0
---and loai_kpi not in('KPI_NV','KPI_CHT_GDV') 
-;
-commit ;
-
-rollback ;
-/* -------- CHT kGDV ------------ */
-/*
-update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set (dinhmuc_1,dinhmuc_2,dinhmuc_3)
-                        =(select dinhmuc_1,dinhmuc_2,dinhmuc_3
-                                from ( select ma_to, ten_to, sum(nvl(dinhmuc_1,0))dinhmuc_1, sum(nvl(dinhmuc_2,0))dinhmuc_2
-                                                   , sum(nvl(dinhmuc_3,0))dinhmuc_3
-                                        from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410
-                                        where loai_kpi in('KPI_NV','KPI_CHT_GDV') and thang = 202410 
-                                          and tinh_bsc = 1 and thaydoi_vtcv = 0 and dinhmuc_1 is not null
-                                  --      and tt_manv = 'VNP017619'
-                                        group by ma_to, ten_to
-                                      ) b
-                          where a.ma_to = b.ma_to 
-                         )
-where loai_kpi in('KPI_CHT_GDV') 
-and thang = 202410 
-and tinh_bsc = 1 and thaydoi_vtcv = 0
-;
-commit ;
-*/
 /* -------------- KHONG GAN GIA TRI KHDK = 0 -------------- */
-select * from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a where KHDK = CANHAN_GIAO ;
-update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set KHDK = CANHAN_GIAO
+select * from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a 
+--where KHDK = CANHAN_GIAO ;
+--update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set KHDK = CANHAN_GIAO
 where thang = 202410 and CANHAN_GIAO > 0 ;
 commit ;
 update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set KHDK = '' ;
 update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set KHDK = CANHAN_GIAO
+-- select * from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a
 where thang = 202410 and CANHAN_GIAO > 0 and KHDK = 0 ;
 commit ;
 
 /* ------------ UP LAI KHDK = 0 KHI TONG_DTGIAO is null and dinhmuc_1 is not null ----------- */
+update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set KHDK = TONG_DTGIAO
+-- select * from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 
+where thang = 202410 and TONG_DTGIAO > 0 and (KHDK is null or KHDK = 0); -- and dinhmuc_1 is not null 
+commit ;
+
 update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set KHDK = 0
 -- select * from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 
-where thang = 202410 and TONG_DTGIAO is null and KHDK is null ; -- and dinhmuc_1 is not null 
-commit ;
-update ttkd_bsc.dinhmuc_giao_dthu_ptm a set KHDK = 0
--- select * from ttkd_bsc.dinhmuc_giao_dthu_ptm
 where thang = 202410 and TONG_DTGIAO is null and KHDK is null ; -- and dinhmuc_1 is not null 
 commit ;
 
@@ -334,7 +306,7 @@ update ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a set (BRCD_DTGIAO, MYTV_DTGIAO, VN
                                           , CNTT_DTGIAO, NHOMBRCD_DTGIAO, NHOMVINA_DTGIAO, NHOMTSL_DTGIAO, NHOMCNTT_DTGIAO, TONG_DTGIAO)
                                     = (select BRCD_DTGIAO, MYTV_DTGIAO, VNPTT_DTGIAO, VNPTS_DTGIAO, TSL_DTGIAO, ITT_DTGIAO
                                           , CNTT_DTGIAO, NHOMBRCD_DTGIAO, NHOMVINA_DTGIAO, NHOMTSL_DTGIAO, NHOMCNTT_DTGIAO, TONG_DTGIAO
-                                        from DINHMUC_GIAO_DTHU_PGDPT where ma_nv = a.ma_nv and thang = 202410)
+                                        from DINHMUC_GIAO_DTHU_PGDPT where thang = 202410 and ma_nv = a.ma_nv)
 -- select a.* from ttkd_bsc.dinhmuc_giao_dthu_ptm_202410 a
 where thang = 202410 
 and exists(select 1 from DINHMUC_GIAO_DTHU_PGDPT where ma_nv = a.ma_nv and thang = 202410)
