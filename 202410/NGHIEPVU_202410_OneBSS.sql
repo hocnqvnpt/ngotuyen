@@ -1170,10 +1170,12 @@ with nv100 as (select ma_nv, LOAI, TEN_LOAIHD, TEN_PB, TEN_TO, ten_nv, ma_kh, NG
 					select LOAI, TEN_LOAIHD, a.TEN_PB, a.TEN_TO, a.ma_nv, a.ten_nv, nv.ten_vtcv, sum(sl) sanluong
 									, case when TEN_LOAIHD in ('CHUYEN DOI LOAI HINH THUE BAO'
 															, 'KHIEU NAI - HOAN THANH', 'BIEN DONG KHAC', 'TIEP NHAN KHAO SAT DAT MOI'
-															, 'TIEP NHAN LAP DAT MOI', 'TAO MOI GOI DA DICH VU', 'THAY DOI GOI DA DICH VU') and loai = 'ONEBSS' then 2
-												when TEN_LOAIHD in ('CAP NHAT DB') and loai = 'CCBS' then 2
-												when TEN_LOAIHD in ('KHIEU NAI - DA XU LY') and loai = 'CCOS' then 2
-														else 1 end khoan
+															, 'TIEP NHAN LAP DAT MOI', 'TAO MOI GOI DA DICH VU', 'THAY DOI GOI DA DICH VU') and loai = 'ONEBSS' then 'DM_KHOAN'
+												when TEN_LOAIHD in ('CAP NHAT DB') and loai = 'CCBS' then 'DM_KHOAN'
+												when TEN_LOAIHD in ('KHIEU NAI - DA XU LY') and loai = 'CCOS' then 'DM_KHOAN'
+												when TEN_LOAIHD in ('LAP DAT MOI - CNTT', 'LAP DAT MOI - CNTTQLDA', 'LAP DAT MOI - BRCD', 'BAN THIET BI') and loai = 'ONEBSS' then 'DM_PTM'
+												when TEN_LOAIHD in ('HMM TRA SAU') and loai = 'CCBS' then 'DM_PTM'
+														else 'DM_HAUMAI' end DANHMUC
 					from nv100 a
 								join ttkd_bsc.nhanvien nv on a.ma_nv = nv.ma_nv and nv.thang = 202410
 					group by LOAI, TEN_LOAIHD, a.TEN_PB, a.TEN_TO, a.ma_nv, a.ten_nv, nv.ten_vtcv
@@ -1181,10 +1183,12 @@ with nv100 as (select ma_nv, LOAI, TEN_LOAIHD, TEN_PB, TEN_TO, ten_nv, ma_kh, NG
 							select LOAI, TEN_LOAIHD, a.TEN_PB, a.TEN_TO, a.ma_nv, a.ten_nv, nv.ten_vtcv, count(*) sanluong
 										, case when TEN_LOAIHD in ('CHUYEN DOI LOAI HINH THUE BAO'
 															, 'KHIEU NAI - HOAN THANH', 'BIEN DONG KHAC', 'TIEP NHAN KHAO SAT DAT MOI'
-															, 'TIEP NHAN LAP DAT MOI', 'TAO MOI GOI DA DICH VU', 'THAY DOI GOI DA DICH VU') and loai = 'ONEBSS' then 2
-												when TEN_LOAIHD in ('CAP NHAT DB') and loai = 'CCBS' then 2
-												when TEN_LOAIHD in ('KHIEU NAI - DA XU LY') and loai = 'CCOS' then 2
-														else 1 end khoan
+															, 'TIEP NHAN LAP DAT MOI', 'TAO MOI GOI DA DICH VU', 'THAY DOI GOI DA DICH VU') and loai = 'ONEBSS' then 'DM_KHOAN'
+												when TEN_LOAIHD in ('CAP NHAT DB') and loai = 'CCBS' then 'DM_KHOAN'
+												when TEN_LOAIHD in ('KHIEU NAI - DA XU LY') and loai = 'CCOS' then 'DM_KHOAN'
+												when TEN_LOAIHD in ('LAP DAT MOI - CNTT', 'LAP DAT MOI - CNTTQLDA', 'LAP DAT MOI - BRCD', 'BAN THIET BI') and loai = 'ONEBSS' then 'DM_PTM'
+												when TEN_LOAIHD in ('HMM TRA SAU') and loai = 'CCBS' then 'DM_PTM'
+														else 'DM_HAUMAI' end DANHMUC
 							  from ttkd_bsc.ct_bsc_nghiepvu a
 										join ttkd_bsc.nhanvien nv on a.ma_nv = nv.ma_nv and nv.thang = 202410
 							  where a.thang = 202410 and a.donvi = 'TTKD'
