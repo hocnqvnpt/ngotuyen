@@ -1087,7 +1087,7 @@ commit ;
 			delete from ttkd_bsc.ct_bsc_nghiepvu a
 --			select * from ttkd_bsc.ct_bsc_nghiepvu a
 					where TEN_LOAIHD = 'CNTTTB' and 'CCBS' = loai and a.thang = 202410
-						and exists (select * from  tuyenngo.sbh_vnp_202410_ct where ten_loaihd = 'CAP NHAT DB' and ma_tb = a.ma_tb)
+						and exists (select * from  tuyenngo.sbh_vnp_202410_ct where ten_loaihd = 'CAP NHAT DB' and a.thang = thang and ma_tb = a.ma_tb)
 			;
 			--lo?i tr? trùng ONEBSS - THAYDOIDATCOC voi ONEBSS - NGHIEPVUKHAC
 			delete from ttkd_bsc.ct_bsc_nghiepvu a
@@ -1137,14 +1137,27 @@ commit ;
 			delete from ttkd_bsc.ct_bsc_nghiepvu a
 --			select * from ttkd_bsc.ct_bsc_nghiepvu a
 					where TEN_LOAIHD = 'THU CUOC' and loai = 'CCBS' and a.thang = 202410
-						and exists (select * from  ttkd_bsc.ct_bsc_nghiepvu where ten_loaihd != 'THU CUOC' and loai = 'CCBS' and ma_tb = a.ma_tb)
+						and exists (select * from  ttkd_bsc.ct_bsc_nghiepvu where ten_loaihd != 'THU CUOC' and loai = 'CCBS' and a.thang = thang and ma_tb = a.ma_tb)
 			;
 			
 			--lo?i tr? trùng CCBS - THU VUOTNGUONG/TAMTHU CN/THUHO voi CCBS - NGHIEP VU KHAC
 			delete from ttkd_bsc.ct_bsc_nghiepvu a
 --			select * from ttkd_bsc.ct_bsc_nghiepvu a
 					where TEN_LOAIHD = 'THU VUOTNGUONG/TAMTHU CN/THUHO' and 'CCBS' = loai and a.thang = 202410
-						and exists (select 1 from  ttkd_bsc.ct_bsc_nghiepvu where ten_loaihd != 'THU VUOTNGUONG/TAMTHU CN/THUHO' and 'CCBS' = loai and ma_tb = a.ma_tb)
+						and exists (select 1 from  ttkd_bsc.ct_bsc_nghiepvu where ten_loaihd != 'THU VUOTNGUONG/TAMTHU CN/THUHO' and 'CCBS' = loai and a.thang = thang and ma_tb = a.ma_tb)
+			;
+			
+			--loại trừ trùng CCBS - DONG MO DV|0 voi CCBS - NGHIEP VU KHAC
+			delete from ttkd_bsc.ct_bsc_nghiepvu a
+--			select * from ttkd_bsc.ct_bsc_nghiepvu a
+					where TEN_LOAIHD = 'DONG MO DV|0' and 'CCBS' = loai and a.thang = 202410
+						and exists (select 1 from  ttkd_bsc.ct_bsc_nghiepvu where ten_loaihd != 'DONG MO DV|0' and 'CCBS' = loai and a.thang = thang and ma_tb = a.ma_tb)
+			;
+			--loại trừ trùng CCBS - DONG MO DV|0 voi CCBS - NGHIEP VU KHAC
+			delete from ttkd_bsc.ct_bsc_nghiepvu a
+--			select * from ttkd_bsc.ct_bsc_nghiepvu a
+					where TEN_LOAIHD = 'DONG MO DV|1' and 'CCBS' = loai and a.thang = 202410
+						and exists (select 1 from  ttkd_bsc.ct_bsc_nghiepvu where ten_loaihd != 'DONG MO DV|1' and 'CCBS' = loai and a.thang = thang and ma_tb = a.ma_tb)
 			;
 commit;
 select a.*
