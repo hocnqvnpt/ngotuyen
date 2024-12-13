@@ -804,6 +804,7 @@ commit ;
 			insert into ttkd_bsc.ct_bsc_nghiepvu (ma_tb, ma_kh, doituong_id, NGAY_DKY_VI, TEN_LOAIHD, LOAI, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, TEN_VTCV, MA_VTCV, MA_TO, MA_PB)
 					with tbl as(select nv.thang, ma_tb, MA_KH, doituong_id, TEN_LOAIHD, MANV_RA_PCT, NGAY_CN, USER_CN
 													, nv.donvi, nv.ma_nv, nv.ten_nv, nv.ten_to, nv.ten_pb, nv.ten_vtcv, nv.ma_vtcv, nv.ma_to, nv.ma_pb
+													, row_number() over(partition by MA_KH, ma_tb, a.MANV_RA_PCT order by a.ngay_cn) rnk
 										from tuyenngo.sbh_vnp_202410_ct a
 														join ttkd_bsc.nhanvien nv on a.MANV_RA_PCT = nv.ma_nv and nv.donvi = 'TTKD' and nv.thang = 202410
 										where TEN_LOAIHD = 'DANG KY HUY CHUYEN DOI GOI CUOC' and MANV_RA_PCT is not null and nvl(doituong_id, 1) not in (1, 25)
@@ -811,6 +812,7 @@ commit ;
 					select ma_tb, MA_KH, doituong_id, trunc(ngay_cn) ngay_cn, TEN_LOAIHD, 'CCBS' loai 
 								, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, TEN_VTCV, MA_VTCV, MA_TO, MA_PB
 					from tbl
+					where rnk = 1
 			;
 			/* ----HauMai-Muc 8----------- CCBS - DK NHOM DAI DIEN HUONG CUOC ------------ 
 				-- Nghiem thu
@@ -876,6 +878,7 @@ commit ;
 			insert into ttkd_bsc.ct_bsc_nghiepvu (ma_tb, ma_kh, DOITUONG_ID, NGAY_DKY_VI, TEN_LOAIHD, LOAI, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, TEN_VTCV, MA_VTCV, MA_TO, MA_PB)
 						with tbl as(select nv.thang, ma_tb, MA_KH, DOITUONG_ID, TEN_LOAIHD, MANV_RA_PCT, NGAY_CN, USER_CN
 														, nv.donvi, nv.ma_nv, nv.ten_nv, nv.ten_to, nv.ten_pb, nv.ten_vtcv, nv.ma_vtcv, nv.ma_to, nv.ma_pb
+														, row_number() over(partition by MA_KH, ma_tb, a.MANV_RA_PCT order by a.ngay_cn) rnk
 											from tuyenngo.sbh_vnp_202410_ct a
 															join ttkd_bsc.nhanvien nv on a.MANV_RA_PCT = nv.ma_nv and nv.donvi = 'TTKD' and nv.thang = 202410
 											where TEN_LOAIHD = 'DOI SIM' and MANV_RA_PCT is not null and nvl(doituong_id, 1) not in (1, 25)
@@ -883,6 +886,7 @@ commit ;
 						select ma_tb, MA_KH, DOITUONG_ID, ngay_cn, TEN_LOAIHD, 'CCBS' loai 
 									, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, TEN_VTCV, MA_VTCV, MA_TO, MA_PB
 						from tbl
+						where rnk = 1
 			;
 			
 			/* -----HauMai-Muc 11---------- CCBS - DONG MO DV|0 ------------ 
@@ -907,7 +911,7 @@ commit ;
 			;
 			insert into ttkd_bsc.ct_bsc_nghiepvu (ma_tb, ma_kh, doituong_id, NGAY_DKY_VI, TEN_LOAIHD, LOAI, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, TEN_VTCV, MA_VTCV, MA_TO, MA_PB)
 					with tbl as(select nv.thang, ma_tb, MA_KH, doituong_id, TEN_LOAIHD, MANV_RA_PCT, NGAY_CN, USER_CN
---													, row_number() over(partition by MA_KH, a.MANV_RA_PCT order by a.ngay_cn) rnk
+--													, row_number() over(partition by MA_KH, ma_tb, a.MANV_RA_PCT order by a.ngay_cn) rnk
 													, nv.donvi, nv.ma_nv, nv.ten_nv, nv.ten_to, nv.ten_pb, nv.ten_vtcv, nv.ma_vtcv, nv.ma_to, nv.ma_pb
 										from tuyenngo.sbh_vnp_202410_ct a
 														join ttkd_bsc.nhanvien nv on a.MANV_RA_PCT = nv.ma_nv and nv.donvi = 'TTKD' and nv.thang = 202410
@@ -916,6 +920,7 @@ commit ;
 					select MA_TB, MA_KH, doituong_id, ngay_cn, TEN_LOAIHD, 'CCBS' loai 
 								, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, TEN_VTCV, MA_VTCV, MA_TO, MA_PB
 					from tbl
+					where rnk = 1
 			;
 			/* ----HauMai-Muc 12----------- CCBS - DONG MO DV|1 ------------ 
 				-- Nghiem thu
@@ -940,6 +945,7 @@ commit ;
 		insert into ttkd_bsc.ct_bsc_nghiepvu (ma_tb, ma_kh, doituong_id, NGAY_DKY_VI, TEN_LOAIHD, LOAI, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, ten_vtcv, MA_VTCV, MA_TO, MA_PB)
 				with tbl as(select nv.thang, ma_tb, MA_KH, doituong_id, TEN_LOAIHD, MANV_RA_PCT, NGAY_CN, USER_CN
 												, nv.donvi, nv.ma_nv, nv.ten_nv, nv.ten_to, nv.ten_pb, nv.ten_vtcv, nv.ma_vtcv, nv.ma_to, nv.ma_pb
+												, row_number() over(partition by MA_KH, ma_tb, a.MANV_RA_PCT order by a.ngay_cn) rnk
 									from tuyenngo.sbh_vnp_202410_ct a
 													join ttkd_bsc.nhanvien nv on a.MANV_RA_PCT = nv.ma_nv and nv.donvi = 'TTKD' and nv.thang = 202410
 									where TEN_LOAIHD = 'DONG MO DV|1' and MANV_RA_PCT is not null and nvl(doituong_id, 1) not in (1, 25)
@@ -947,6 +953,7 @@ commit ;
 				select MA_TB, MA_KH, doituong_id, ngay_cn, TEN_LOAIHD, 'CCBS' loai 
 							, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, TEN_VTCV, MA_VTCV, MA_TO, MA_PB
 				from tbl
+				where rnk = 1
 			;
 	commit ;		
 			/* -----HauMai-Muc 13---------- CCBS - DONG TRUOC GOI CUOC ------------ 
@@ -972,6 +979,7 @@ commit ;
 			insert into ttkd_bsc.ct_bsc_nghiepvu (ma_tb, ma_kh, doituong_id, NGAY_DKY_VI, TEN_LOAIHD, LOAI, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, ten_vtcv, MA_VTCV, MA_TO, MA_PB)
 						with tbl as(select nv.thang, ma_tb, MA_KH, doituong_id, TEN_LOAIHD, MANV_RA_PCT, NGAY_CN, USER_CN
 														, nv.donvi, nv.ma_nv, nv.ten_nv, nv.ten_to, nv.ten_pb, nv.ten_vtcv, nv.ma_vtcv, nv.ma_to, nv.ma_pb
+														, row_number() over(partition by MA_KH, ma_tb, a.MANV_RA_PCT order by a.ngay_cn) rnk
 											from tuyenngo.sbh_vnp_202410_ct a
 															join ttkd_bsc.nhanvien nv on a.MANV_RA_PCT = nv.ma_nv and nv.donvi = 'TTKD' and nv.thang = 202410
 											where TEN_LOAIHD = 'DONG TRUOC GOI CUOC' and MANV_RA_PCT is not null and nvl(doituong_id, 1) not in (1, 25)
@@ -979,6 +987,7 @@ commit ;
 						select ma_tb, MA_KH, doituong_id, ngay_cn, TEN_LOAIHD, 'CCBS' loai 
 									, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, ten_vtcv, MA_VTCV, MA_TO, MA_PB
 						from tbl
+						where rnk = 1
 			;
 			
 			/* -----HauMai-Muc 14---------- CCBS - THANH LY/PTOC ------------ 
