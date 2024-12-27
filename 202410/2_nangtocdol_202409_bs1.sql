@@ -5,25 +5,26 @@ drop table tuyenngo.thaydoitocdo_202409_bs1_goc purge ;
 create table tuyenngo.thaydoitocdo_202409_bs1 as
 with v_hd as
        ( -- fiber:        
-         SELECT hd.*, hd_adsl.tucthi FROM css.v_hd_thuebao@dataguard hd, css.v_hdtb_adsl@dataguard hd_adsl
+         SELECT hd.*, hd_adsl.tucthi 
+            FROM css.v_hd_thuebao@dataguard hd, css.v_hdtb_adsl@dataguard hd_adsl
            WHERE 
               hd.phanvung_id = 28 AND hd_adsl.phanvung_id = 28 AND hd.hdtb_id=hd_adsl.hdtb_id 
              AND hd.loaitb_id = 58
              AND hd.tthd_id IN (5, 6)
              AND hd.nguoi_cn <> 'ccbs'
-             AND hd.kieuld_id IN (743)
+             AND hd.kieuld_id IN (24, 654, 13080)
              AND hd.ngay_kh  BETWEEN TO_DATE('202408', 'yyyyMM') AND ADD_MONTHS(TO_DATE('202409', 'yyyyMM'), 1) - 1/86400
-             AND (hd.ghichu not LIKE 'Tu dong doi toc do%' OR hd.ghichu IS NULL)
+             AND (hd.ghichu LIKE 'Tu dong doi toc do%' OR hd.ghichu IS NULL)
              AND hd.ngay_kh = (SELECT MAX(ngay_kh)
                                FROM css.v_hd_thuebao@dataguard
                                WHERE phanvung_id = 28
                                  AND tthd_id IN (5, 6)
                                  AND loaitb_id = 58
                                  AND TO_CHAR(ngay_kh, 'yyyymm') BETWEEN '202408' AND '202409'
-                                 AND kieuld_id IN (743)
+                                 AND kieuld_id IN (24, 654, 13080)
                                  AND thuebao_id = hd.thuebao_id
                             )
-
+/*27151475, 24456596
            UNION ALL
          -- TSL:  
          SELECT hd.*, null as tucthi FROM css.v_hd_thuebao@dataguard hd
@@ -39,6 +40,7 @@ with v_hd as
                                  AND hd1.kieuld_id IN (64, 65, 596, 684, 696, 190, 702, 13127, 952)
                                  AND hd1.thuebao_id = hd.thuebao_id
                             )
+ */
        ) 
   ,v_km_old as
        (SELECT thuebao_id, tyle_sd FROM css.v_khuyenmai_dbtb@dataguard
@@ -67,14 +69,17 @@ with v_hd as
                  where dbtb.ky_cuoc = 20240901 and dbtb.phanvung_id = 28 and dbtt.phanvung_id = 28 and dbkh.phanvung_id = 28
                    AND dbtb.thanhtoan_id = dbtt.thanhtoan_id (+)
                    AND dbtb.khachhang_id = dbkh.khachhang_id (+)
-                   AND dbtb.doituong_id (+) NOT IN (14, 15, 16, 17, 19, 32, 33, 34, 35, 36, 48, 51, 52, 54, 55, 56, 57, 66, 47, 49, 50)
+                   --AND dbtb.doituong_id (+) NOT IN (14, 15, 16, 17, 19, 32, 33, 34, 35, 36, 48, 51, 52, 54, 55, 56, 57, 66, 47, 49, 50)
+                   -- may nghiep vu, cong vu, nghiep vu X, VMS,STTTT, BOCA
                  )
  ,v_dbtb_old as (select thuebao_id, thanhtoan_id, khachhang_id, chuquan_id, ten_tb, diachi_ld,doituong_id, ngay_sd, tocdo_id
                         ,cuoc_tk_goc, cuoc_tc_goc, cuoc_nix, cuoc_isp, mucuoctb_id, trangthaitb_id, loaitb_id
                  from tinhcuoc.v_dbtb@dataguard 
                  where ky_cuoc = 20240801 and phanvung_id = 28 
-                   AND doituong_id (+) NOT IN (14, 15, 16, 17, 19, 32, 33, 34, 35, 36, 48, 51, 52, 54, 55, 56, 57, 66, 47, 49, 50)
-                  )
+                 --and ma_tb = 'chiphobao_2'
+                 --  AND doituong_id (+) NOT IN (14, 15, 16, 17, 19, 32, 33, 34, 35, 36, 48, 51, 52, 54, 55, 56, 57, 66, 47, 49, 50)
+                   -- may nghiep vu, cong vu, nghiep vu X, VMS,STTTT, BOCA
+                 )
  ,v_nv as
      ( select nv.nhanvien_id, nv.ma_nv ma_tiepthi, nv.ma_nv ma_tiepthi_new, nv.ten_nv ten_tiepthi, dm1.ten_dv to_tt, dm2.ten_dv donvi_tt
         from admin.v_nhanvien@dataguard nv, admin.v_donvi@dataguard dm1, admin.v_donvi@dataguard dm2
@@ -86,9 +91,8 @@ SELECT DISTINCT
      ,b.kieuld_id, (select ten_kieuld from css.kieu_ld@dataguard where kieuld_id=b.kieuld_id)tenkieu_ld
      ,a.loaihd_id, b.dichvuvt_id, b.loaitb_id, a.hdkh_id, b.hdtb_id, dbtb_new.so_gt, dbtb_new.mst_kh, dbtb_new.mst_tt
      ,a.khachhang_id, dbtb_new.thanhtoan_id, b.thuebao_id, dbtb_new.chuquan_id, dbtb_new.ten_tb, dbtb_new.diachi_ld
-     ,dbtb_new.doituong_id, dbtb_new.ngay_sd, b.ngay_ht, b.ngay_kh, b.ngay_ins, dbtb_new.trangthaitb_id, a.ma_duan ma_duan_banhang
-
-     ,a.ctv_id, a.nhanvien_id, nv.ma_tiepthi, nv.ma_tiepthi_new, nv.ten_tiepthi, nv.to_tt, nv.donvi_tt
+     ,dbtb_new.doituong_id, dbtb_new.ngay_sd, b.ngay_ht, b.ngay_kh, b.ngay_ins, dbtb_new.trangthaitb_id, b.ghichu
+     ,a.ma_duan ma_duan_banhang, a.ctv_id, a.nhanvien_id, nv.ma_tiepthi, nv.ma_tiepthi_new, nv.ten_tiepthi, nv.to_tt, nv.donvi_tt
      ,decode(b.tucthi,0,'Thang sau','Tuc thi') tucthi
      ,dbtb_old.tocdo_id tocdo_dbold_id,  dbtb_new.tocdo_id tocdo_dbnew_id
      ,dbtb_old.mucuoctb_id mucuoctb_id_old, b.mucuoctb_id mucuoctb_id_new 
@@ -122,12 +126,13 @@ SELECT DISTINCT
         ) dthu_goi_new         
  
   FROM css.v_hd_khachhang@dataguard a, v_hd b, v_km_old km_old, v_km_new km_new, v_dbtb_new dbtb_new, v_dbtb_old dbtb_old, v_nv nv
-  WHERE a.hdkh_id = b.hdkh_id and a.phanvung_id = 28 and b.phanvung_id = 28
-    AND b.thuebao_id = km_old.thuebao_id (+)
-    AND b.thuebao_id = km_new.thuebao_id (+)
-    AND b.thuebao_id = dbtb_old.thuebao_id (+)
-    AND b.thuebao_id = dbtb_new.thuebao_id (+)
-    and a.ctv_id=nv.nhanvien_id
+  WHERE a.hdkh_id = b.hdkh_id 
+    and a.phanvung_id = 28 and b.phanvung_id = 28
+    and b.thuebao_id = km_old.thuebao_id (+)
+    and b.thuebao_id = km_new.thuebao_id (+)
+    and b.thuebao_id = dbtb_old.thuebao_id (+)
+    and b.thuebao_id = dbtb_new.thuebao_id (+)
+    and a.ctv_id = nv.nhanvien_id(+)
 ;
 
 create index thaydoitocdo_202409_bs1_hdtbid on thaydoitocdo_202409_bs1 (hdtb_id) ;
@@ -136,6 +141,7 @@ create index thaydoitocdo_202409_bs1_maduan on thaydoitocdo_202409_bs1 (ma_duan_
 create index thaydoitocdo_202409_bs1_matb on thaydoitocdo_202409_bs1 (ma_tb) ;
 
 select * from thaydoitocdo_202409_bs1 ;
+select * from tuyenngo.thaydoitocdo_202409_bs1 ;
 
 alter table thaydoitocdo_202409_bs1 
     add ( tien_dvgt_bs number, 
@@ -151,14 +157,16 @@ alter table thaydoitocdo_202409_bs1
 commit ;
 create table thaydoitocdo_202409_bs1_goc as select * from thaydoitocdo_202409_bs1 ; -- luu bang truoc khi delete
 select * from thaydoitocdo_202409_bs1_goc;
-rollback ;
+select * from tuyenngo.thaydoitocdo_202409_bs1 ;
+
 delete from thaydoitocdo_202409_bs1 a
     -- select * from thaydoitocdo_202409_bs1 a
     where loaitb_id in (58,59) 
                 and ( (tucthi='Tuc thi' and to_char(ngay_kh,'yyyymm')='202408') 
                             or (tucthi='Thang sau' and to_char(ngay_kh,'yyyymm')='202409')
-                            or exists(select 1 from ttkd_bsc.ct_bsc_ptm where hdtb_id=a.hdtb_id));
+                            or exists(select * from ttkd_bsc.ct_bsc_ptm where hdtb_id=a.hdtb_id));
  commit ;
+ 
 -- ma_duan:
 drop table temp_tbduan;
 create table temp_tbduan as 
@@ -186,7 +194,7 @@ update thaydoitocdo_202409_bs1 a
 alter table thaydoitocdo_202409_bs1 add dthu_ps_old_1 number ;
 commit ;
 
-select ma_tb, count(*)sl from thaydoitocdo_202409_bs1 group by ma_tb ;
+select ma_tb, count(*)sl from thaydoitocdo_202409_bs1 group by ma_tb having count(*)>1 ;
 select ma_tb, count(*)sl from bcss.v_thftth@dataguard
 where ky_cuoc=20240901 group by ma_tb having count(*)>1 ;
 select * from bcss.v_thftth@dataguard where ky_cuoc=20240901  ;
@@ -248,6 +256,7 @@ update thaydoitocdo_202409_bs1 a
         and exists (select 1 from bcss.v_thftth@dataguard where ky_cuoc=20240901 and cuoc_ipgoc>0 and ma_tb=a.ma_tb);
 
 commit ;
+
 update thaydoitocdo_202409_bs1 a 
     set dthu_goi_new = nvl(dthu_goi_new,0) + nvl(iptinh,0)
     where iptinh > 0 ;
@@ -267,7 +276,7 @@ update thaydoitocdo_202409_bs1 a
     set lydo_khongtinh_luong=lydo_khongtinh_luong||'-Tinh luong theo hs lap moi'
     -- select lydo_khongtinh_luong from thaydoitocdo_202409_bs1 a
     where exists (select 1 from ttkd_bsc.ct_bsc_ptm where thang_ptm=202409 and loaihd_id=1 and thuebao_id=a.thuebao_id)
-       ;
+;
 
 commit ;
 --select a.* from thaydoitocdo_202409_bs1 a where exists (select 1 from tuyenngo.cdbr_ptm_202409_bctuan where loaihd_id=1 and thuebao_id=a.thuebao_id) ;
@@ -320,9 +329,9 @@ update thaydoitocdo_202409_bs1 a set (pbh_ptm_id,manv_ptm,tennv_ptm,ma_to,ten_to
           (select pb.pbh_id,b.ma_nv,b.ten_nv,b.ma_to,b.ten_to,b.ma_pb,b.ten_pb,b.ma_vtcv,b.loai_ld,nhomld_id
            from ttkd_bsc.nhanvien b, ttkd_bsc.dm_phongban pb 
            where b.thang=202409 and b.donvi='TTKD' and b.ma_pb=pb.ma_pb and pb.active=1 and b.ma_nv=a.ma_tiepthi_new)
-    where exists(select 1 from ttkd_bsc.nhanvien b where b.manv_hrm=a.ma_tiepthi_new and b.thang=202409 and b.donvi='TTKD');
+    where exists(select 1 from ttkd_bsc.nhanvien b where b.ma_nv=a.ma_tiepthi_new and b.thang=202409 and b.donvi='TTKD');
  commit ;
- 
+select * from thaydoitocdo_202409_bs1 a ;
 /* --------------- INSERT V�O FILE GOM ---------------- */
 insert into ttkd_bsc.ct_bsc_ptm 
                     (thang_luong, thang_ptm,ma_gd,ma_kh,ma_tb,dich_vu,tenkieu_ld,ten_tb,diachi_ld,so_gt, mst,mst_tt,
@@ -333,7 +342,7 @@ insert into ttkd_bsc.ct_bsc_ptm
                     dthu_ps_truoc, dthu_ps, dthu_goi, mien_hsgoc,ghi_chu,nguon, nhanvien_nhan_id,
                     chuquan_id, ma_da, ma_duan_banhang, lydo_khongtinh_luong, tocdo_id,manv_hotro, 
                     tyle_hotro, tyle_am, heso_hotro_nvptm, heso_hotro_nvhotro)  
-        select  202409, 202409 , ma_gd,ma_kh,ma_tb,dich_vu,tenkieu_ld,ten_tb,diachi_ld,so_gt,mst_kh, mst_tt,
+        select  999, 202409 , ma_gd,ma_kh,ma_tb,dich_vu,tenkieu_ld,ten_tb,diachi_ld,so_gt,mst_kh, mst_tt,
                     ngay_ht,ngay_luuhs_ttkd, ngay_luuhs_ttvt,kieuld_id,loaihd_id,dichvuvt_id,loaitb_id,
                     hdkh_id, hdtb_id, khachhang_id,thanhtoan_id,thuebao_id,trangthaitb_id, 
                     doituong_id,ma_tiepthi,ma_tiepthi_new,donvi_tt, manv_ptm,tennv_ptm,
@@ -343,7 +352,7 @@ insert into ttkd_bsc.ct_bsc_ptm
                     tyle_hotro, tyle_am, tyle_am, tyle_hotro 
         from tuyenngo.thaydoitocdo_202409_bs1 a
         where not exists (select * from ttkd_bsc.ct_bsc_ptm where hdtb_id=a.hdtb_id )
-          and loaitb_id!=39;
+          and loaitb_id!=39 and kieuld_id = 743 ;
             
 commit; 
 
