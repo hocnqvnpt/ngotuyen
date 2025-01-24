@@ -1,18 +1,18 @@
-drop table tam_luuhs_20241218 purge ;
-create table tam_luuhs_20241218 as 
+drop table tam_luuhs_20250104 purge ;
+create table tam_luuhs_20250104 as 
         SELECT * --ma_tb, loaitb_id, dichvuvt_id, ma_gd, hdtb_id, nhanvien_bg nhanvien_id, nop_du, ngay_nop_du
 --            , ngay_nop, ngay_bg, dinhkem, econtract_app -- econtract_app = 1 l� qua App
-        from ttkd_bsc.bangiao_hoso_tinhbsc a
+        from ttkd_bct.bangiao_hoso_tinhbsc a
 --        from ttkdhcm_ktnv.bangiao_hoso_tinhbsc a
         
-       where trunc(ngay_bg) between to_date('01/08/2024','dd/mm/yyyy') and to_date('18/12/2024','dd/mm/yyyy')
+       where trunc(ngay_bg) between to_date('01/09/2024','dd/mm/yyyy') and to_date('04/01/2025','dd/mm/yyyy')
 
 ;
 commit ;
 
---create table ttkd_bct.nt_tam_luuhs_20241218 as 
--- drop table nt_tam_luuhs_20241218 purge ;
-create table nt_tam_luuhs_20241218 as 
+--create table ttkd_bct.nt_tam_luuhs_20250104 as 
+-- drop table nt_tam_luuhs_20250104 purge ;
+create table nt_tam_luuhs_20250104 as 
 select distinct ma_tb, loaitb_id, dichvuvt_id, ma_gd, hdtb_id, econtract_app, donvi_nhap, nhanvien_id, donvi_id_nhap, 
        decode(donvi_id_nhap,283466,'TTVT SG',283452,'TTVT CL',283467,'TTVT GD',283451,'TTVT TB',283453,'TTVT BC',283454,'TTVT CC',
                             283455,'TTVT HM',283468,'TTVT NSG',283469,'TTVT TD') ten_ttvt, nop_du, 
@@ -34,18 +34,20 @@ from
         SELECT ma_tb, loaitb_id, dichvuvt_id, ma_gd, econtract_app, hdtb_id, nhanvien_bg nhanvien_id, nop_du
                 , ngay_nop_du, ngay_bg, ngay_nop
 --                , max(ngay_nop_du) ngay_nop_du, max(ngay_bg)ngay_bg, max(ngay_nop) ngay_nop
-        FROM ttkd_bct.tam_luuhs_20241218 a 
+        FROM ttkd_bct.tam_luuhs_20250104 a 
 --        group by ma_tb, loaitb_id, dichvuvt_id, ma_gd, dinhkem, hdtb_id, nhanvien_id, nop_du
       ) a 
   ) a 
 -- group by ma_tb, loaitb_id, dichvuvt_id, ma_gd, dinhkem, hdtb_id, donvi_nhap, nhanvien_id, donvi_id_nhap, nop_du
 ;
-CREATE INDEX nt_tam_luuhs_20241218_HDID ON nt_tam_luuhs_20241218 (hdtb_id ASC) ;
-CREATE INDEX nt_tam_luuhs_20241218_matb ON nt_tam_luuhs_20241218 (ma_tb ASC) ;
-CREATE INDEX nt_tam_luuhs_20241218_magd ON nt_tam_luuhs_20241218 (ma_gd ASC) ;
+CREATE INDEX nt_tam_luuhs_20250104_HDID ON nt_tam_luuhs_20250104 (hdtb_id ASC) ;
+CREATE INDEX nt_tam_luuhs_20250104_matb ON nt_tam_luuhs_20250104 (ma_tb ASC) ;
+CREATE INDEX nt_tam_luuhs_20250104_magd ON nt_tam_luuhs_20250104 (ma_gd ASC) ;
 
 
-select * from ttkd_bct.nt_tam_luuhs_20241218 where to_char(ngay_nop_du,'yyyymm') >= 202408 and ma_gd like '%HCM-LD%' ;
+select * from ttkd_bct.nt_tam_luuhs_20250104 
+where to_char(ngay_nop_du,'yyyymm') >= 202409
+and ma_gd like '%HCM-LD%' ;
 /* --------------------------------------------- */
 select a.thang_ptm, a.ma_tb, a.nop_du, a.dich_vu, nguon, ngay_luuhs_ttvt, ngay_luuhs_ttkd
 from ttkd_bsc.ct_bsc_ptm a 
@@ -60,19 +62,87 @@ select hdtb_id from ttkd_bsc.ct_bsc_ptm a
 
 select nguon, thang_luong, thang_ptm, count(*)sl 
 from ttkd_bsc.ct_bsc_ptm a 
-where thang_ptm >= 202408
+where thang_ptm >= 202409
 and (nop_du is null or nop_du=0)
 and dich_vu not in('VNPTS','VCC','VNPTT')
 and nguon is not null
 --and mien_hsgoc is not null
 group by nguon, thang_luong, thang_ptm order by nguon, thang_luong, thang_ptm ;
 
-/* --------- UPDATE NGAY 19/05/2023 ------------------ */
+/* ------------- UPDATE LOAITB_ID IN(1,58,59,61,171) CO HSG HDDT ------------- */
+select * from ttkd_bct.nt_tam_luuhs_20250104 
+where loaitb_id in(1,58,59,61,171) 
+and econtract_app = 1
+;
+/* --------- UPDATE LOAITB_ID IN(1,58,59,61,171) CO HSG HDDT - UPDATE NGAY 04/01/2025 ------------------ */
 update ttkd_bsc.ct_bsc_ptm a set (a.bs_luukho, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt)=
-        ( select distinct '20241218', b.nop_du
+        ( select distinct '20250104', b.nop_du
             , (case when donvi_nhap='TTKD' then b.ngay_bg else NULL end)
             , (case when donvi_nhap='TTVT' then b.ngay_bg else NULL end)
-          from ttkd_bct.nt_tam_luuhs_20241218 b 
+          from ttkd_bct.nt_tam_luuhs_20250104 b 
+            where b.loaitb_id in(1,58,59,61,171) 
+                and b.econtract_app = 1
+                and b.nop_du=1 and b.ngay_nop_du is not null -- and econtract_app = 1 
+                and b.ma_tb=a.ma_tb and b.ma_gd=a.ma_gd --and b.hdtb_id=a.hdtb_id
+        ) 
+-- select thang_ptm, ma_tb, ma_gd, hdtb_id, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt from ttkd_bsc.ct_bsc_ptm a
+where (nop_du is null or nop_du=0) and thang_ptm >= 202409 
+ and mien_hsgoc is null -- CHI TUNG YC KHONG CAN XET MIEN_HOSO_GOC
+ and dich_vu not in('VNPTS','VCC','VNPTT')
+ and loaitb_id in(1,58,59,61,171) 
+ and nguon is not null
+-- and nguon in('thaydoitocdo','ptm_codinh')
+; 
+commit ;
+
+/* --------- UPDATE LOAITB_ID IN(1,58,59,61,171) CO HSG HDDT - UPDATE NGAY 04/01/2025 ------------------ */
+update ttkd_bsc.ct_bsc_ptm a set (a.bs_luukho, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt)=
+        ( select distinct '20250104', b.nop_du
+            , (case when donvi_nhap='TTKD' then b.ngay_bg else NULL end)
+            , (case when donvi_nhap='TTVT' then b.ngay_bg else NULL end)
+   --         , loaitb_id, econtract_app
+          from ttkd_bct.nt_tam_luuhs_20250104 b 
+            where b.nop_du=1 and b.ngay_nop_du is not null -- and econtract_app = 0
+                and loaitb_id in(1,58,59,61,171)
+                and b.ma_tb=a.ma_tb and b.ma_gd=a.ma_gd --and b.hdtb_id=a.hdtb_id
+        ) 
+-- select thang_ptm, ma_tb, ma_gd, hdtb_id, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt from ttkd_bsc.ct_bsc_ptm a
+where (nop_du is null or nop_du=0) and thang_ptm >= 202409 and thang_ptm < 202412
+ and mien_hsgoc is null -- CHI TUNG YC KHONG CAN XET MIEN_HOSO_GOC
+ and dich_vu not in('VNPTS','VCC','VNPTT')
+ and loaitb_id in(1,58,59,61,171) 
+ and nguon is not null
+-- and nguon in('thaydoitocdo','ptm_codinh')
+; 
+commit ;
+
+/* --------- UPDATE LOAITB_ID NOT IN(1,58,59,61,171) CO HSG HDDT - UPDATE NGAY 04/01/2025 ------------------ */
+update ttkd_bsc.ct_bsc_ptm a set (a.bs_luukho, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt)=
+        ( select distinct '20250104', b.nop_du
+            , (case when donvi_nhap='TTKD' then b.ngay_bg else NULL end)
+            , (case when donvi_nhap='TTVT' then b.ngay_bg else NULL end)
+   --         , loaitb_id, econtract_app
+          from ttkd_bct.nt_tam_luuhs_20250104 b 
+            where b.loaitb_id not in(1,58,59,61,171,20)                 
+                and b.nop_du=1 and b.ngay_nop_du is not null -- and econtract_app = 0
+                and b.ma_tb=a.ma_tb and b.ma_gd=a.ma_gd --and b.hdtb_id=a.hdtb_id
+        ) 
+-- select thang_ptm, ma_tb, ma_gd, hdtb_id, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt from ttkd_bsc.ct_bsc_ptm a
+where (nop_du is null or nop_du=0) and thang_ptm >= 202409 
+ and mien_hsgoc is null -- CHI TUNG YC KHONG CAN XET MIEN_HOSO_GOC
+ and dich_vu not in('VNPTS','VCC','VNPTT')
+ and loaitb_id not in(1,58,59,61,171) 
+ and nguon is not null
+-- and nguon in('thaydoitocdo','ptm_codinh')
+; 
+commit ;
+
+/* --------- UPDATE NGAY 19/05/2023 ------------------ */
+update ttkd_bsc.ct_bsc_ptm a set (a.bs_luukho, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt)=
+        ( select distinct '20250104', b.nop_du
+            , (case when donvi_nhap='TTKD' then b.ngay_bg else NULL end)
+            , (case when donvi_nhap='TTVT' then b.ngay_bg else NULL end)
+          from ttkd_bct.nt_tam_luuhs_20250104 b 
             where b.ma_tb=a.ma_tb and b.ma_gd=a.ma_gd --and b.hdtb_id=a.hdtb_id
               and b.nop_du=1 and b.ngay_nop_du is not null -- and econtract_app <> 1 
         ) 
@@ -87,10 +157,10 @@ commit ;
 
 
 update ttkd_bsc.ct_bsc_ptm a set (a.bs_luukho, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt)=
-        ( select distinct '20241218', b.nop_du
+        ( select distinct '20250104', b.nop_du
             , (case when donvi_nhap='TTKD' then b.ngay_bg else NULL end)
             , (case when donvi_nhap='TTVT' then b.ngay_bg else NULL end)
-          from ttkd_bct.nt_tam_luuhs_20241218 b 
+          from ttkd_bct.nt_tam_luuhs_20250104 b 
             where b.ma_tb=a.ma_tb and b.ma_gd=a.ma_gd and b.hdtb_id=a.hdtb_id
               and b.nop_du=1 and b.ngay_nop_du is not null -- and econtract_app <> 1 
         ) 
@@ -110,10 +180,10 @@ where bs_luukho = '20241113' ;
 commit ;
 */
 update ttkd_bsc.ct_bsc_ptm a set (a.bs_luukho, a.nop_du, a.ngay_luuhs_ttkd,a.ngay_luuhs_ttvt)=
-        ( select distinct '20241218', b.nop_du
+        ( select distinct '20250104', b.nop_du
             , (case when donvi_nhap='TTKD' then b.ngay_bg else NULL end)
             , (case when donvi_nhap='TTVT' then b.ngay_bg else NULL end)
-          from ttkd_bct.nt_tam_luuhs_20241218 b 
+          from ttkd_bct.nt_tam_luuhs_20250104 b 
             where b.ma_tb=a.ma_tb and b.ma_gd=a.ma_gd 
               and b.nop_du=1 and b.ngay_nop_du is not null and econtract_app = 1 
         ) 
@@ -146,37 +216,37 @@ group by thang_ptm, nguon, dichvuvt_id ORDER by thang_ptm, nguon, dichvuvt_id ;
 
 /*---------------- UP THUE BAO econtract_app <> 1 ------------------- */ 
 /* ---------- UP THANG N-3 -------------- */
-update ttkd_bsc.ct_bsc_ptm a set a.bs_luukho = '20241218' , a.nop_du = 1
+update ttkd_bsc.ct_bsc_ptm a set a.bs_luukho = '20250104' , a.nop_du = 1
                                     , a.ngay_luuhs_ttkd = to_date('18/12/2024','dd/mm/yyyy')
                                     , a.ngay_luuhs_ttvt = to_date('18/12/2024','dd/mm/yyyy')
-where exists(select * from ttkd_bct.nt_tam_luuhs_20241218 b 
+where exists(select * from ttkd_bct.nt_tam_luuhs_20250104 b 
                 where nop_du=1 and b.ngay_nop_du is not null and b.ma_gd like 'HCM-LD%'
                 and dichvuvt_id = 2 and to_char(ngay_bg,'yyyymm') > '202408' and b.ma_tb=a.ma_tb 
             ) 
 and thang_ptm = 202408 ;
 /* ---------- UP THANG N-2 -------------- */
-update ttkd_bsc.ct_bsc_ptm a set a.bs_luukho = '20241218' , a.nop_du = 1
+update ttkd_bsc.ct_bsc_ptm a set a.bs_luukho = '20250104' , a.nop_du = 1
                                     , a.ngay_luuhs_ttkd = to_date('18/12/2024','dd/mm/yyyy')
                                     , a.ngay_luuhs_ttvt = to_date('18/12/2024','dd/mm/yyyy')
-where exists(select * from ttkd_bct.nt_tam_luuhs_20241218 b 
+where exists(select * from ttkd_bct.nt_tam_luuhs_20250104 b 
                 where nop_du=1 and b.ngay_nop_du is not null and b.ma_gd like 'HCM-LD%'
                 and dichvuvt_id = 2 and to_char(ngay_bg,'yyyymm') >= '202409' and b.ma_tb=a.ma_tb 
             ) 
 and thang_ptm = 202409 ;
 /* ---------- UP THANG N-1 -------------- */
-update ttkd_bsc.ct_bsc_ptm a set a.bs_luukho = '20241218' , a.nop_du = 1
+update ttkd_bsc.ct_bsc_ptm a set a.bs_luukho = '20250104' , a.nop_du = 1
                                     , a.ngay_luuhs_ttkd = to_date('18/12/2024','dd/mm/yyyy')
                                     , a.ngay_luuhs_ttvt = to_date('18/12/2024','dd/mm/yyyy')
-where exists(select * from ttkd_bct.nt_tam_luuhs_20241218 b 
+where exists(select * from ttkd_bct.nt_tam_luuhs_20250104 b 
                 where nop_du=1 and b.ngay_nop_du is not null and b.ma_gd like 'HCM-LD%'
                 and dichvuvt_id = 2 and to_char(ngay_bg,'yyyymm') >= '202410' and b.ma_tb=a.ma_tb 
             ) 
 and thang_ptm = 202410 ;
 /* ---------- UP THANG N -------------- */
-update ttkd_bsc.ct_bsc_ptm a set a.bs_luukho = '20241218' , a.nop_du = 1
+update ttkd_bsc.ct_bsc_ptm a set a.bs_luukho = '20250104' , a.nop_du = 1
                                     , a.ngay_luuhs_ttkd = to_date('18/12/2024','dd/mm/yyyy')
                                     , a.ngay_luuhs_ttvt = to_date('18/12/2024','dd/mm/yyyy')
-where exists(select * from ttkd_bct.nt_tam_luuhs_20241218 b 
+where exists(select * from ttkd_bct.nt_tam_luuhs_20250104 b 
                 where nop_du=1 and b.ngay_nop_du is not null and b.ma_gd like 'HCM-LD%'
                 and dichvuvt_id = 2 and to_char(ngay_bg,'yyyymm') >= '202411' and b.ma_tb=a.ma_tb 
             ) 

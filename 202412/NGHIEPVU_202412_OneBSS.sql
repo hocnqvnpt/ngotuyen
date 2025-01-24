@@ -4,12 +4,12 @@
 
 select * from SBH_vinagift_202412_CT where manv_cn in('790627','790272') ;
 select distinct manv_cn,nhanvien_cn from SBH_vinagift_202412_CT where manv_hrm is null ;
-
+select * from SBH_vinagift_202412_CT where mucdich_sd = 'GHTT' ;
 delete from SBH_vinagift_202412_CT where mucdich_sd = 'GHTT' ;
 commit ;
 
-update SBH_vinagift_202412_CT set manv_hrm=upper(manv_cn) where manv_cn in('CTV053229','ctv041285') ;
-commit ;
+--update SBH_vinagift_202412_CT set manv_hrm=upper(manv_cn) where manv_cn in('CTV053229','ctv041285') ;
+--commit ;
 update SBH_vinagift_202412_CT set manv_cn=upper(manv_cn) ;
 
 update SBH_vinagift_202412_CT set manv_cn='000'||manv_cn where length(trim(manv_cn))=2 ;
@@ -26,17 +26,11 @@ update SBH_vinagift_202412_CT a set (a.ten_nv,a.ma_vtcv,a.ten_vtcv,a.ma_to,a.ten
                       from ttkd_bsc.nhanvien where manv_hrm = a.manv_hrm and thang = 202412) where a.manv_hrm is not null ;
 commit ;
 
-
-update SBH_vinagift_202412_CT a set (a.ten_nv,a.ma_vtcv,a.ten_vtcv,a.ma_to,a.ten_to,a.ma_pb,a.ten_pb)
-                    =(select ten_nv,ma_vtcv,ten_vtcv,ma_to,ten_to,ma_pb,ten_pb 
-                      from ttkd_bsc.nhanvien where manv_hrm = a.manv_hrm and thang = 202412) where a.manv_hrm is not null ;
-commit ;
-
 select distinct manv_cn,nhanvien_cn from SBH_vinagift_202412_CT where manv_hrm is null ;
 
 select * from SBH_vinagift_202412_CT where manv_hrm is null ;
       select so_seri ma_tb,NULL ma_gd, NULL ma_kh,manv_hrm manv_ra_pct,ten_nv tennv_ra_pct,ma_to mato_ra_pct,ten_to tento_ra_pct,ma_pb mapb_ra_pct,ten_pb tenpb_ra_pct,
-             ma_vtcv, to_date('01/11/2024 00:00','dd/mm/yyyy hh24:mi')ngay_cn, 0 tg_damthoai, 'VINAGIFT' TEN_LOAIHD,'VINAGIFT' loai 
+             ma_vtcv, to_date('01/12/2024 00:00','dd/mm/yyyy hh24:mi')ngay_cn, 0 tg_damthoai, 'VINAGIFT' TEN_LOAIHD,'VINAGIFT' loai 
              from SBH_VINAGIFT_202412_CT 
 
 /* ------------------ UPDATE USSD ------------------- */
@@ -105,7 +99,7 @@ create table a_sbh_temp as
             (case when hdkh.ctv_id > 0 then (select ten_nv from admin.nhanvien@dataguard where nhanvien_id = hdkh.ctv_id and rownum=1) else null end) ten_tiepthi            
       from css.v_hd_khachhang@dataguard hdkh, css.v_hd_thuebao@dataguard hdtb
       where hdkh.hdkh_id=hdtb.hdkh_id 
-      and hdkh.ngay_yc between to_date('01/11/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/11/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
+      and hdkh.ngay_yc between to_date('01/12/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/12/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
       and hdtb.dichvuvt_id <> 2 
 ;
 
@@ -136,13 +130,13 @@ from
               a.ma_tb,a.loaitb_id,a.dichvuvt_id, a.ngay_tn, a.nguoi_cn, a.nhanvien_id, a.nhanvien_gq_id, 
               'KHIEU NAI - TIEPNHAN'TEN_LOAIHD, MA_KN, ngay_GQ
       from qltn.v_khieunai@dataguard a where phanvung_id=28 and a.dichvuvt_id <> 2 
-      and a.ngay_tn between to_date('01/11/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/11/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
+      and a.ngay_tn between to_date('01/12/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/12/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
       union all
       select to_char(trunc(a.ngay_gq),'yyyymm') thang, a.donvi_id, a.thuebao_id,            
               a.ma_tb,a.loaitb_id,a.dichvuvt_id, a.ngay_tn, a.nguoi_cn, a.nhanvien_id, a.nhanvien_gq_id, 
               'KHIEU NAI - HOAN THANH' TEN_LOAIHD, MA_KN, NGAY_GQ
       from qltn.v_khieunai@dataguard a where phanvung_id=28 and a.dichvuvt_id <> 2 
-      and a.ngay_gq between to_date('01/11/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/11/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')  
+      and a.ngay_gq between to_date('01/12/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/12/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')  
 ) a
 left join (select db.khachhang_id, db.thuebao_id from css.v_db_thuebao@dataguard db) db on a.thuebao_id = db.thuebao_id
 ;
@@ -188,8 +182,8 @@ from
        Select distinct to_char(trunc(a.ngay_cn),'yyyymm') thang, a.phieu_id, a.thanhtoan_id, a.ngay_tt, a.ma_tt, a.ma_tn, b.nguoi_cn, a.ngay_cn
                     , a.nhanvien_id, a.httt_id, b.ma_tb, b.dichvuvt_id, 99 loaihd_id, 'THU CUOC' ten_loaihd
        From qltn.v_Bangphieutra@dataguard a, qltn.v_ct_tra@dataguard b
-       Where a.phieu_id=b.phieu_id and b.dichvuvt_Id <> 2 and a.ky_cuoc='20241001' and b.ky_cuoc='20241001'
-         and a.ngay_cn between to_date('01/11/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/11/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
+       Where a.phieu_id=b.phieu_id and b.dichvuvt_Id <> 2 and a.ky_cuoc='20241101' and b.ky_cuoc='20241101'
+         and a.ngay_cn between to_date('01/12/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/12/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
      ) a, v_db db
 where  a.thanhtoan_id = db.thanhtoan_id(+)
 --and a.dichvuvt_id = db.dichvuvt_id(+)
@@ -208,23 +202,31 @@ from a_sbh_temp a, v_nv nv
 create index SBH_CT_THU_202412_CT_matb on SBH_CT_THU_202412_CT(ma_tb) ;
 
 /* ---------------------- VNP ----------------------- */
-drop table SOLIEU_CCBS purge ;
-create table SOLIEU_CCBS as 
-select distinct a.* from ccs_hcm.SOLIEU_CCBS_20241225@ttkddbbk2 a 
---  where ngay_cn between to_date('01/11/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/11/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
+drop table SOLIEU_CCBS_2 purge ;
+create table SOLIEU_CCBS_2 as 
+select distinct a.* from ccs_hcm.SOLIEU_CCBS_202412@ttkddbbk2 a 
+--  where ngay_cn between to_date('01/12/2024 00:01:00','dd/mm/yyyy hh24:mi:ss') and to_date('30/12/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
 ;
-create index SOLIEU_CCBS_user_cn on SOLIEU_CCBS (user_cn) ;
-create index SOLIEU_CCBS_matb on SOLIEU_CCBS (ma_tb) ;
-select distinct loai_cn from SOLIEU_CCBS ;
+create index SOLIEU_CCBS_2_user_cn on SOLIEU_CCBS_2 (user_cn) ;
+create index SOLIEU_CCBS_2_matb on SOLIEU_CCBS_2 (ma_tb) ;
 
-create table danhba_dds_112024_temp as
-select somay, ma_hd, ma_kh from ccs_hcm.danhba_dds_112024@ttkddbbk2 ;
-create index danhba_dds_112024_temp_somay on danhba_dds_112024_temp (somay) ;
+select distinct a.* from ccs_hcm.SOLIEU_CCBS_202412@ttkddbbk2 a ;
+
+select distinct loai_cn from ccs_hcm.SOLIEU_CCBS_202412@ttkddbbk2 a ;
+select distinct loai_cn from SOLIEU_CCBS_3 ;
+
+drop table danhba_dds_temp purge ;
+create table danhba_dds_temp as
+select somay, ma_hd, ma_kh, doituong_id from ccs_hcm.danhba_dds_122024@ttkddbbk2 ;
+create index danhba_dds_temp_somay on danhba_dds_temp (somay) ;
 
 -- drop table SBH_VNP_202412_CT purge ;
 CREATE TABLE "TUYENNGO"."SBH_VNP_202412_CT" 
-   (	"MA_KH" VARCHAR2(20 BYTE), 
-	"MA_TB" VARCHAR2(30 BYTE), 
+   (	
+  	"MA_GD" VARCHAR2(30 BYTE),
+    "MA_KH" VARCHAR2(20 BYTE), 
+	"MA_TB" VARCHAR2(30 BYTE),
+    "MST" VARCHAR2(30 BYTE),
 	"LOAI_TB" VARCHAR2(30 BYTE), 
 	"MANV_RA_PCT" VARCHAR2(20 BYTE), 
 	"TENNV_RA_PCT" VARCHAR2(100 BYTE), 
@@ -234,39 +236,64 @@ CREATE TABLE "TUYENNGO"."SBH_VNP_202412_CT"
 	"TENTO_RA_PCT" VARCHAR2(100 BYTE), 
 	"MAPB_RA_PCT" VARCHAR2(20 BYTE), 
 	"TENPB_RA_PCT" VARCHAR2(100 BYTE), 
-	"USER_CN" VARCHAR2(50 BYTE), 
+	"USER_CN" VARCHAR2(70 BYTE), 
 	"NGAY_CN" DATE, 
-	"TEN_LOAIHD" VARCHAR2(100 BYTE), 
-	"MA_GD" VARCHAR2(30 BYTE)
+	"TEN_LOAIHD" VARCHAR2(100 BYTE) ,
+    "LOAIHD_ID" NUMBER,
+    "DOITUONG_ID" NUMBER
    ) 
 ;
-select * from SBH_VNP_202412_CT ;
+select distinct TEN_LOAIHD from SBH_VNP_202412_CT ;
 truncate table SBH_VNP_202412_CT ;
-insert into SBH_VNP_202412_CT(MA_KH, MA_TB, LOAI_TB, MANV_RA_PCT, TENNV_RA_PCT, MA_VTCV, TEN_VTCV, MATO_RA_PCT, TENTO_RA_PCT
-                            , MAPB_RA_PCT, TENPB_RA_PCT, USER_CN, NGAY_CN, TEN_LOAIHD, MA_GD)
-select ma_kh,ma_tb,loai_tb, manv_ra_pct, tennv_ra_pct,ma_vtcv, ten_vtcv, mato_ra_pct, tento_ra_pct, mapb_ra_pct
-     , tenpb_ra_pct, user_cn, ngay_cn, ten_loaihd, ma_gd
+insert into SBH_VNP_202412_CT(MA_GD, MA_KH, MA_TB, MST, LOAI_TB, MANV_RA_PCT, TENNV_RA_PCT, MA_VTCV, TEN_VTCV, MATO_RA_PCT, TENTO_RA_PCT
+                            , MAPB_RA_PCT, TENPB_RA_PCT, USER_CN, NGAY_CN, TEN_LOAIHD, doituong_id)
+
+select a.ma_gd, a.ma_kh, a.ma_tb, replace(kh.ms_thue,' ','')ms_thue, a.loai_tb, a.manv_ra_pct, a.tennv_ra_pct, a.ma_vtcv, a.ten_vtcv
+     , a.mato_ra_pct, a.tento_ra_pct, a.mapb_ra_pct, a.tenpb_ra_pct, a.user_cn, a.ngay_cn, a.ten_loaihd, a.doituong_id
 from 
 (
     select  ( case when a.ma_kh is not null then cast(a.ma_kh as varchar(20))
                 else cast(db.ma_kh as varchar(20)) end)ma_kh
-            ,cast(a.ma_tb as varchar(30))ma_tb,
-            (case when a.loai_tb is null then 'CARD' else a.loai_tb end )loai_tb, 
-              nv.manv_hrm manv_ra_pct,nv.ten_nv tennv_ra_pct,nv.ma_vtcv,nv.ten_vtcv,nv.ma_to mato_ra_pct,
-              ( case when substr(a.user_cn,1,2) like 'dl%' then 'DAI LY' else nv.ten_to end ) tento_ra_pct, nv.ma_pb mapb_ra_pct,
-              ( case when substr(a.user_cn,1,2) like 'dl%' then (select buucuc from nhuy.userld_202411_goc where user_ld=a.user_cn) 
-                     else nv.ten_pb end ) tenpb_ra_pct,
-              a.user_cn, a.ngay_cn, (case when a.loai_cn='THANH LY' then 'THANH LY/PTOC' else a.loai_cn end) ten_loaihd,
+            , cast(a.ma_tb as varchar(30))ma_tb
+            ,(case when a.loai_tb is null then 'CARD' else a.loai_tb end )loai_tb
+            ,nv.manv_hrm manv_ra_pct,nv.ten_nv tennv_ra_pct,nv.ma_vtcv,nv.ten_vtcv,nv.ma_to mato_ra_pct
+            ,( case when substr(a.user_cn,1,2) like 'dl%' then 'DAI LY' else nv.ten_to end ) tento_ra_pct, nv.ma_pb mapb_ra_pct
+            ,( case when substr(a.user_cn,1,2) like 'dl%' then (select buucuc from nhuy.userld_202412_goc where user_ld=a.user_cn) 
+                   else nv.ten_pb end ) tenpb_ra_pct
+            ,a.user_cn, a.ngay_cn, (case when a.loai_cn='THANH LY' then 'THANH LY/PTOC' else a.loai_cn end) ten_loaihd
 --              (select ma_hd from danhba_dds_112024_temp where somay=a.ma_tb and rownum=1)ma_gd
-             db.ma_hd ma_gd
-    from SOLIEU_CCBS a 
+--            ,db.ma_hd ma_gd
+            , db.doituong_id
+    from SOLIEU_CCBS_2 a 
     left join ttkd_bsc.nhanvien nv on a.user_cn=nv.user_ccbs and nv.thang = 202412
-    left join tuyenngo.danhba_dds_112024_temp db on db.somay=a.ma_tb and rownum=1
-) 
+    left join tuyenngo.danhba_dds_temp db on db.somay=a.ma_tb and rownum=1
+) a left join ccs_hcm.khachhangs_122024@ttkddbbk2 kh on a.ma_kh = kh.ma_kh
+;
+commit ;
+update SBH_VNP_202412_CT a set loaihd_id = (select distinct loaihd_id from SBH_VNP_202411_CT where ten_loaihd = a.ten_loaihd) ;
+commit ;
+select distinct ma_gd, ten_loaihd from SBH_VNP_202412_CT 
+where ten_loaihd in('HMM TRA SAU','CHUYEN QUYEN') ;
+
+alter table SBH_VNP_202412_CT add magd varchar2(20) ;
+update SBH_VNP_202412_CT a set magd = ma_gd 
+where ten_loaihd = 'HMM TRA SAU' and ma_gd like 'HCM-LD%'
 ;
 
+update SBH_VNP_202412_CT a set magd = ma_gd 
+where ten_loaihd = 'CHUYEN QUYEN' and ma_gd like 'HCM-CQ%'
+;
 commit ;
 
+select magd, ten_loaihd from SBH_VNP_202412_CT 
+where ten_loaihd in('HMM TRA SAU','CHUYEN QUYEN') ;
+select * -- distinct tennv_ra_pct
+from SBH_VNP_202412_CT 
+where mapb_ra_pct = 'VNP0702500' 
+and ma_tb in('84836754744','84836476787','84816628897','84819424697','84944028725','84941963571'
+,'84818484698','84946701826','84838397895','84949046134') 
+and ten_loaihd in('DANG KY HUY CHUYEN DOI GOI CUOC','THANH LY/PTOC') ;
+-- select * from ccs_hcm.danhba_dds_112024@ttkddbbk2 where lpad(sim,2) = 10;
 ------END gom dữ liệu nguon----
 
 -----BEGIN chọn các nghiệp vụ tính đơn giá-------
@@ -281,7 +308,7 @@ insert into ttkd_bsc.ct_bsc_nghiepvu (THANG, MA_TB, NGAY_DKY_VI, DONVI, MA_NV, T
 			select a.THANG, ma_tb, ngay_dky_vi, donvi, ma_nv, ten_nv, ten_to, ten_pb, ten_vtcv, ma_vtcv, ma_to, ma_pb, cast('VI_VNPTPAY' as varchar(20)) loai, 'CAI VI' TEN_LOAIHD
 			from ttkdhcm_ktnv.hcm_vnptpay_ketqua a
 						 join ttkd_bsc.nhanvien nv on nv.donvi = 'TTKD' and a.ma_hrm = nv.ma_nv and nv.thang = a.thang
-			where ngay_dky_vi between to_date('01/11/2024 00:00:01','dd/mm/yyyy hh24:mi:ss') and to_date('30/11/2024 23:59:59','dd/mm/yyyy hh24:mi:ss') 
+			where ngay_dky_vi between to_date('01/12/2024 00:00:01','dd/mm/yyyy hh24:mi:ss') and to_date('30/12/2024 23:59:59','dd/mm/yyyy hh24:mi:ss') 
 						and ma_hrm is not null
 			;
 
@@ -290,7 +317,7 @@ insert into ttkd_bsc.ct_bsc_nghiepvu (THANG, MA_TB, NGAY_DKY_VI, DONVI, MA_NV, T
 		select a.THANG, ma_tb, ngay_dky_mm, donvi, ma_nv, ten_nv, ten_to, TEN_PB, TEN_VTCV, MA_VTCV, ma_to, ma_pb, 'VI_VNPTMM' loai, 'CAI VI' TEN_LOAIHD
 		from ttkdhcm_ktnv.hcm_vmoney_ketqua a
 					join ttkd_bsc.nhanvien nv on nv.donvi = 'TTKD' and a.ma_hrm = nv.ma_nv and nv.thang = a.thang
-		where ngay_dky_mm between to_date('01/11/2024 00:00:01','dd/mm/yyyy hh24:mi:ss') and to_date('30/11/2024 23:59:59','dd/mm/yyyy hh24:mi:ss') 
+		where ngay_dky_mm between to_date('01/12/2024 00:00:01','dd/mm/yyyy hh24:mi:ss') and to_date('30/12/2024 23:59:59','dd/mm/yyyy hh24:mi:ss') 
 					and not exists (select * from ttkd_bsc.ct_bsc_nghiepvu ex where loai = 'VI_VNPTPAY' and a.ma_tb = ex.ma_tb)
 			;
 
@@ -299,7 +326,7 @@ insert into ttkd_bsc.ct_bsc_nghiepvu (THANG, MA_TB, NGAY_DKY_VI, DONVI, MA_NV, T
 		select a.THANG, ma_tb, ngay_active, donvi, ma_nv, ten_nv, ten_to, TEN_PB, TEN_VTCV, MA_VTCV, ma_to, ma_pb, 'APP_MYVNPT' loai, 'CAI APP' TEN_LOAIHD
 		from ttkdhcm_ktnv.HCM_VNPTAPP_ACTIVE a
 					join ttkd_bsc.nhanvien nv on nv.donvi = 'TTKD' and a.ma_hrm = nv.ma_nv and nv.thang = a.thang
-		where ngay_active between to_date('01/11/2024 00:00:01','dd/mm/yyyy hh24:mi:ss') and to_date('30/11/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
+		where ngay_active between to_date('01/12/2024 00:00:01','dd/mm/yyyy hh24:mi:ss') and to_date('30/12/2024 23:59:59','dd/mm/yyyy hh24:mi:ss')
 ;
 commit ;
 /*----HauMai-Muc 4-----CCOS - KHIEU NAI - TIEPNHAN--------*/
@@ -356,7 +383,7 @@ commit ;
 				select to_char(trunc(a.ngay_tn),'yyyymm') thang, a.donvi_id, a.thuebao_id, a.ma_tb,a.loaitb_id,a.dichvuvt_id,
                     a.ngay_tn, a.nguoi_cn, a.nhanvien_id, a.nhanvien_gq_id, MA_KN, ngay_GQ, TTKN_ID
       from qltn.v_khieunai@dataguard a
-	 where a.ngay_tn between to_date('01/11/2024','dd/mm/yyyy') and to_date('30/11/2024','dd/mm/yyyy')
+	 where a.ngay_tn between to_date('01/12/2024','dd/mm/yyyy') and to_date('30/12/2024','dd/mm/yyyy')
 	 ;
 
 
@@ -381,7 +408,7 @@ commit ;
 	create table ttkd_bsc.x_temp_gqkn AS 
 				select to_char(trunc(a.ngay_gq),'yyyymm') thang, a.donvi_id, a.thuebao_id, a.ma_tb,a.loaitb_id,a.dichvuvt_id, a.ngay_tn, a.nguoi_cn, a.nhanvien_id, a.nhanvien_gq_id, MA_KN, ngay_GQ, TTKN_ID
       from qltn.v_khieunai@dataguard a
-	 where a.ngay_gq between to_date('01/11/2024','dd/mm/yyyy') and to_date('30/11/2024','dd/mm/yyyy')
+	 where a.ngay_gq between to_date('01/12/2024','dd/mm/yyyy') and to_date('30/12/2024','dd/mm/yyyy')
 	 ;
 	 
 	 insert into ttkd_bsc.ct_bsc_nghiepvu (THUEBAO_ID, KHACHHANG_ID, THANHTOAN_ID, MA_TB, NGAY_DKY_VI, TEN_LOAIHD, LOAI, ma_pa, THANG, DONVI, MA_NV, TEN_NV, TEN_TO, TEN_PB, TEN_VTCV, MA_VTCV, MA_TO, MA_PB)
@@ -1242,7 +1269,7 @@ from tbl1 a
 			select distinct LOAI, TEN_LOAIHD, cast(null as number) heso from ttkd_bsc.ct_bsc_nghiepvu where thang = 202412;
 		  		select * from ttkd_bsc.ct_bsc_nghiepvu where ten_loaihd = 'DONG MO DV|0' and thang = 202412;
 			select * from tuyenngo.sbh_vnp_202412_ct a;
-			select distinct LOAI_CN from tuyenngo.solieu_ccbs a;
+			select distinct LOAI_CN from tuyenngo.solieu_ccbs_2 a;
 			select distinct ten_loaihd from tuyenngo.sbh_202412_CT a;
 			select * from tuyenngo.sbh_ct_thu_202412_ct a where manv_ra_pct is not null;
 		  */

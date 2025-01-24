@@ -164,8 +164,9 @@ create table temp_tbduan as
 create index temp_tbduan on temp_tbduan (thuebao_id);
 
 alter table thaydoitocdo_202412 add ma_duan varchar2(20);
+select ma_duan, count(*)sl from temp_tbduan group by ma_duan ;
 update thaydoitocdo_202412 a 
-        set ma_duan=(select replace(ma_duan,' ','') from temp_tbduan where thuebao_id=a.thuebao_id);
+        set ma_duan=(select distinct replace(ma_duan,' ','') from temp_tbduan where thuebao_id=a.thuebao_id);
      
 commit ;
 select * from thaydoitocdo_202412 ; 
@@ -185,7 +186,8 @@ commit ;
 select ma_tb, count(*)sl from thaydoitocdo_202412 group by ma_tb ;
 select ma_tb, count(*)sl from bcss.v_thftth@dataguard
 where ky_cuoc=20241201 group by ma_tb having count(*)>1 ;
-select * from bcss.v_thftth@dataguard where ky_cuoc=20241201  ;
+
+select * from bcss.v_thftth@dataguard where ky_cuoc = 20241201  ;
 
 drop table a_temp_old purge ;
 create table a_temp_old as -- 453 cuoc TT GDVP
@@ -288,6 +290,8 @@ commit ;
 --drop table thaydoitocdo_202412_goc purge ;
 create table thaydoitocdo_202412_goc as select * from thaydoitocdo_202412 ; -- luu bang truoc khi delete
 select * from thaydoitocdo_202412_goc;
+select * from thaydoitocdo_202412 where to_char(ngay_sd,'yyyymm') = 202412 ;
+select * from ttkd_bsc.ct_bsc_ptm where ma_tb = 'phuochung888' ;
 
 delete from thaydoitocdo_202412 a
     -- select * from thaydoitocdo_202412 a
@@ -408,7 +412,7 @@ select thang_luong, thang_ptm, ma_gd, ma_tb, dich_vu, ngay_bbbg, lydo_khongtinh_
        ,dthu_goi, nvl(dthu_ps_truoc,0)dthu_ps_truoc, nvl(dthu_ps,0)dthu_ps, nvl(dthu_ps_N1,0)dthu_ps_N1
        ,nvl(dthu_ps_N2,0)dthu_ps_N2, nvl(dthu_ps_N3,0)dthu_ps_N3, thang_tldg_dt, luong_dongia_nvptm
 from ttkd_bsc.ct_bsc_ptm 
-where thang_ptm between 202408 and 202412
+where thang_ptm between 202409 and 202412
 and thang_tldg_dt is null and dthu_goi > 0
 and nguon='thaydoitocdo' 
 --and thang_ptm=202411
@@ -418,7 +422,7 @@ and lydo_khongtinh_luong like 'Cuoc phat sinh sau khi doi toc do khong cao hon'
 ;
 
 update  ttkd_bsc.ct_bsc_ptm set lydo_khongtinh_luong = '', LYDO_KHONGTINH_DONGIA = ''
-where thang_ptm between 202408 and 202412
+where thang_ptm between 202409 and 202412
 and thang_tldg_dt is null and dthu_goi > 0
 and nguon='thaydoitocdo' 
 and ( (dthu_ps_truoc < nvl(dthu_ps_N1,0)) or (dthu_ps_truoc < nvl(dthu_ps_N2,0)) or (dthu_ps_truoc < nvl(dthu_ps_N3,0)) )
