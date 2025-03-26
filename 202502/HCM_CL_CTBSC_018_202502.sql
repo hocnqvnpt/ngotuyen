@@ -1,12 +1,20 @@
 /* ---------- UP SO GIAO ----------- */
-select * from bangluong_kpi where thang=202502 and ma_kpi='HCM_CL_CTBSC_018' ;
+select * from ttkd_bsc.bangluong_kpi where thang=202502 and ma_kpi='HCM_CL_CTBSC_018' ;
 select * from ttkd_bsc.nhanvien where thang = 202502 ;
 
-update bangluong_kpi a set giao = 100, tytrong = 10, DONVI_TINH ='%'
+select THANG, MA_KPI, TEN_KPI, MA_NV, TEN_NV, MA_VTCV, TEN_VTCV, MA_TO, TEN_TO, MA_PB, TEN_PB
+    , NGAYCONG, TYTRONG, DONVI_TINH, CHITIEU_GIAO, MUCDO_HOANTHANH
+from ttkd_bsc.bangluong_kpi where thang=202502 and ma_kpi='HCM_CL_CTBSC_018' ;
+
+select distinct MA_VTCV, TEN_VTCV from ttkd_bsc.bangluong_kpi where thang=202502 and ma_kpi='HCM_CL_CTBSC_018' ;
+
+update ttkd_bsc.bangluong_kpi a set giao = '', CHITIEU_GIAO = 100, tytrong = 10, DONVI_TINH ='%'
 where thang=202502 
 and ma_kpi='HCM_CL_CTBSC_018' 
 ;
 commit ;
+select * from ttkd_bsc.blkpi_danhmuc_kpi where thang = 202502 and ma_kpi = 'HCM_CL_CTBSC_018' ;
+
 
 -- drop table TUYENNGO.KPI_CL_CTBSC_018 purge ;
   CREATE TABLE "TUYENNGO"."KPI_CL_CTBSC_018" 
